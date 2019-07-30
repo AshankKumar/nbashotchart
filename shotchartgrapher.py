@@ -43,25 +43,52 @@ def getShotData2(name, startYear, endYear):
     return shotDataList
 
 def plotShots2():
-    shotDataList = getShotData2("Brook Lopez", 2016, 2019)
+    shotDataList = getShotData2("Brook Lopez", 2014, 2019)
     global seasonList
 
     fig=go.Figure() 
-    fig = make_subplots(rows=len(shotDataList), cols=1, subplot_titles=seasonList) #rows set to number of seasons
+    if(len(shotDataList) % 2 == 0):
+        fig = make_subplots(rows=int(len(shotDataList)/2), cols=2, subplot_titles=seasonList)
+    else:
+        fig = make_subplots(rows=int(len(shotDataList)/2)+1, cols=2, subplot_titles=seasonList)
 
     shotData = shotDataList[0]
     made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
     missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
-    fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"), 1,1) 
-    fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot"), 1,1)
-    
-    i = 2
-    for shotData in shotDataList[1:]: #Can't append all the traces starting from the first set of data in shotDataList since the first subplot must have its legend shown while the rest must not, for stylistic purposes
+    fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot", opacity=0.5), 1,1) 
+    fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot", opacity=0.5), 1,1)
+        
+    shotData = shotDataList[1]
+    made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+    missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+    fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot", showlegend=False, opacity=0.5), 1,2) 
+    fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot", showlegend=False, opacity=0.5), 1,2)
+        
+    row = 2 #row number
+    col = 1 #col number
+    for shotData in shotDataList[2:]: #Can't append all the traces starting from the first set of data in shotDataList since the first subplot must have its legend shown while the rest must not, for stylistic purposes
+        if(col==3): 
+            col=1 #only two columns so reset col number back to 1 every 2 iterations of the for loop
+            row+=1  #increment row number after both columns in row have had a graph appended to them
         made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
         missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
-        fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot", showlegend=False), i,1) 
-        fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot", showlegend=False), i,1)
-        i+=1
+        fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot", showlegend=False, opacity=0.5), row,col) 
+        fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot", showlegend=False, opacity=0.5), row,col)
+        col+=1
+
+    # shotData = shotDataList[0]
+    # made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+    # missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+    # fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"), 1,1) 
+    # fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot"), 1,1)
+    
+    # i = 2
+    # for shotData in shotDataList[1:]: #Can't append all the traces starting from the first set of data in shotDataList since the first subplot must have its legend shown while the rest must not, for stylistic purposes
+    #     made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+    #     missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+    #     fig.append_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot", showlegend=False), 1,i) 
+    #     fig.append_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="Red", name="Missed Shot", showlegend=False), 1,i)
+    #     i+=1
 
     return fig
 
@@ -288,8 +315,10 @@ def drawCourt2():
     )
 
     for i in range(len(seasonList)): #iterate through each subplot to updates axes
-        fig.update_xaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=i+1,col=1) 
-        fig.update_yaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=i+1,col=1)
+        # fig.update_xaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=i+1,col=1) 
+        # fig.update_yaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=i+1,col=1)
+        fig.update_xaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=1,col=i+1) 
+        fig.update_yaxes(dict(showticklabels=False, showgrid=False, zeroline=False),row=1,col=i+1)
 
     fig.update(layout=layout)
     fig.show()
