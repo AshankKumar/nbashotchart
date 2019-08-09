@@ -202,81 +202,40 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    html.H1(
-        children="NBA Shotchart",
-        style={
-            'textAlign': 'center',
-        }
-    ),
-    html.Div(children='Shot data for Brook Lopez in 2018-19', style={
-        'textAlign': 'center',
-    }),
-    dcc.Graph(
-        figure={
-            'data':[
-                {
-                    'x':[-100],
-                    'y':[100]
-                }
-            ],
-            'layout': go.Layout( #{
-                shapes= court_shapes,
-                height=800,
-                width=1000,
-                xaxis= dict(
-                    showgrid=False,
-                    range=[-300, 300],
-                    showticklabels=False,
-                    zeroline=False
-                ),
-                yaxis= dict(
-                    showgrid=False,
-                    range=[-100, 500],
-                    showticklabels=False,
-                    zeroline=False
+    html.Div([
+        dcc.Graph(
+            figure={
+                'data':[
+                    {
+                        'x':[-100],
+                        'y':[100]
+                    }
+                ],
+                'layout': go.Layout( #{
+                    shapes= court_shapes,
+                    height=800,
+                    width=1000,
+                    xaxis= dict(
+                        showgrid=False,
+                        range=[-300, 300],
+                        showticklabels=False,
+                        zeroline=False
+                    ),
+                    yaxis= dict(
+                        showgrid=False,
+                        range=[-100, 500],
+                        showticklabels=False,
+                        zeroline=False
+                    )
                 )
-            )
-                # 'shapes': court_shapes,
-                # 'height': 800,
-                # 'width': 1000,
-                # xaxis=dict(
-                #     showgrid=False,
-                #     range=[-300, 300],
-                #     showticklabels=False,
-                #     zeroline=False
-                # ),
-                # yaxis=dict(
-                #     showgrid=False,
-                #     range=[-100, 500],
-                #     showticklabels=False,
-                #     zeroline=False
-                # )
-            # }
-        }
-    )#,
-    # html.Div(className='row', children= [
-    #     html.Div([
-    #         dcc.Input(id='playerName-state', type='text', value='Brook Lopez'),
-    #         dcc.Input(id='season-state', type='text', value='2018-2019')
-    #         #html.Button(id='submit-button', type='submit', children='Submit'), #changing type='submit' with n_clicks=0 seems to make no difference...
-    #     ],
-    #     style = dict(
-    #         verticalAlign = "middle"
-    #         )
-    #     )
-    # ])
-],style = {'margin': 'auto', 'width': "50%"})
-
-
-# @app.callback(Output('output-state', 'children'),
-#               [Input('submit-button', 'n_clicks')],
-#               [State('input-1-state', 'value'),
-#                State('input-2-state', 'value')])
-# def update_output(clicks, input1, input2):
-#     return u'''
-#         Input 1 is "{}",
-#         and Input 2 is "{}"
-#     '''.format(input1, input2) #have to take in clicks input but just don't format it xd
+            }
+        ),
+    ],style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
+    html.Div([
+            dcc.Input(id='playerName-state', type='text', value='Brook Lopez'),
+            dcc.Input(id='season-state', type='text', value='2018-2019')
+    ],style = {'margin-left': '750px'})
+])
 
 
 if __name__ == '__main__':
