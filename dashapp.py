@@ -3,6 +3,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
+from nba_api.stats.static import players
+from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
 
 court_shapes = []
  
@@ -204,6 +206,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div([
     html.Div([
         dcc.Graph(
+            id='shot-graph',
             figure={
                 'data':[
                     {
@@ -211,7 +214,7 @@ app.layout = html.Div([
                         'y':[100]
                     }
                 ],
-                'layout': go.Layout( #{
+                'layout': go.Layout( 
                     shapes= court_shapes,
                     height=800,
                     width=1000,
@@ -233,10 +236,85 @@ app.layout = html.Div([
     ],style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
     html.Div([
             dcc.Input(id='playerName-state', type='text', value='Brook Lopez'),
-            dcc.Input(id='season-state', type='text', value='2018-2019')
+            dcc.Input(id='season-state', type='text', value='2018-19')
     ],style = {'margin-left': '750px'})
 ])
 
+@app.callback(
+    Output('shot-graph', 'figure'),
+    [Input(component_id='playerName-state', component_property='value'),
+    Input(component_id='season-state', component_property='value')]
+)
+def update_figure(playerName, season):#Maybe do fig append instead of returning something
+    playerID = players.find_players_by_full_name(str(playerName))[0]['id']
+    shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= str(season), context_measure_simple= "FGA")
+    shotData = shotchart_detail.get_data_frames()[0]
+    shotData["LOC_X"] *= -1
+    made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+    missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"))
+    fig.add_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="RED", name="Missed Shot"))
+    
+    layout = go.Layout(
+        title='Shots by Brook Lopez in the %s NBA season' % season, #change to be based on variable passed
+        showlegend=True,
+        xaxis=dict(
+            showgrid=False,
+            range=[-300, 300],
+            showticklabels=False,
+            zeroline=False
+        ),
+        yaxis=dict(
+            showgrid=False,
+            range=[-100, 500],
+            showticklabels=False,
+            zeroline=False
+        ),
+        height = 800,
+        width = 1000,
+        shapes=court_shapes
+    )
+    fig.update(layout=layout)
+
+    return fig
+    # return {
+    #     'data': [go.Scatter(
+    #         x=made_shots["LOC_X"],
+    #         y=made_shots["LOC_Y"],
+    #         mode='markers',
+    #         marker_color='BLUE',
+    #         name='Made Shot'
+    #     )],
+    #     'layout': go.layout(
+    #         xaxis={
+    #             'showgrid': False
+    #         }
+    #     )
+    #         shapes= court_shapes,
+    #         height=800,
+    #         width=1000,
+    #         xaxis={
+    #             'showgrid': False,
+    #         },
+    #         yaxis={
+    #             'showgrid': False,
+    #         }
+    #         xaxis= dict(
+    #             showgrid=False,
+    #             range=[-300, 300],
+    #             showticklabels=False,
+    #             zeroline=False
+    #         ),
+    #         yaxis= dict(
+    #             showgrid=False,
+    #             range=[-100, 500],
+    #             showticklabels=False,
+    #             zeroline=False
+    #         )
+    #     )
+    # }
 
 if __name__ == '__main__':
     app.run_server(debug=True)
