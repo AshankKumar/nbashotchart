@@ -210,7 +210,7 @@ def getShotData(name, year):
     court_shapes.append(res_area_shape)
     #print(string_season)
     layout = go.Layout(
-        title='Shots by Brook Lopez in the %s NBA season' % string_season, #change to be based on variable passed
+        title='Shots by Brook Lopez in the %s NBA season' % (name, string_season), #change to be based on variable passed
         showlegend=True,
         xaxis=dict(
             showgrid=False,
@@ -232,4 +232,4 @@ def getShotData(name, year):
     fig.update(layout=layout)
     fig.show()
 
-getShotData("Brook Lopez", 2018)
+getShotData("Lebron James", 2018)
