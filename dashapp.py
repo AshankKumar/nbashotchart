@@ -3,8 +3,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
+import plotly.io as pio
 from nba_api.stats.static import players
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
+
+pio.templates.default= "none"
 
 court_shapes = []
  
