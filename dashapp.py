@@ -208,13 +208,8 @@ app.layout = html.Div([
         dcc.Graph(
             id='shot-graph',
             figure={
-                # 'data':[
-                #     {
-                #         'x':[-100],
-                #         'y':[100]
-                #     }
-                # ],
                 'layout': go.Layout( 
+                    title="test",
                     shapes= court_shapes,
                     height=800,
                     width=1000,
@@ -231,6 +226,9 @@ app.layout = html.Div([
                         zeroline=False
                     )
                 )
+            },
+            config={
+                'displayModeBar': False
             }
         ),
     ],style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
@@ -262,7 +260,7 @@ def update_figure(n_clicks, playerName, season):
     
     layout = go.Layout(
         title='Shots by %s in the %s NBA season' % (playerName, season), 
-        showlegend=True,
+        showlegend=False,
         xaxis=dict(
             showgrid=False,
             range=[-300, 300],
@@ -277,7 +275,9 @@ def update_figure(n_clicks, playerName, season):
         ),
         height = 800,
         width = 1000,
-        shapes=court_shapes
+        shapes=court_shapes,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
     )
     fig.update(layout=layout)
 
