@@ -231,7 +231,8 @@ app.layout = html.Div([
                 )
             },
             config={
-                'displayModeBar': False
+                'displayModeBar': False,
+                'staticPlot': True
             }
         ),
     ],style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
@@ -276,11 +277,12 @@ def update_figure(n_clicks, playerName, season):
             showticklabels=False,
             zeroline=False
         ),
-        height = 800,
-        width = 1000,
+        height=800,
+        width=1000,
         shapes=court_shapes,
         paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)',
+        hovermode=False
     )
     fig.update(layout=layout)
 
