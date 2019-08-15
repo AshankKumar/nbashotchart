@@ -226,7 +226,9 @@ def getShotData(name, year):
         ),
         height = 800,
         width = 1000,
-        shapes=court_shapes
+        shapes=court_shapes,
+        hovermode=False
+        
     )
 
     fig.update(layout=layout)
