@@ -251,42 +251,70 @@ app.layout = html.Div([
         State(component_id='season-state', component_property='value')]
 )
 def update_figure(n_clicks, playerName, season):
-    playerID = players.find_players_by_full_name(str(playerName))[0]['id']
-    shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= str(season), context_measure_simple= "FGA")
-    shotData = shotchart_detail.get_data_frames()[0]
-    shotData["LOC_X"] *= -1
-    made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
-    missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+    try:
+        playerID = players.find_players_by_full_name(str(playerName))[0]['id']
+        shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= str(season), context_measure_simple= "FGA")
+        shotData = shotchart_detail.get_data_frames()[0]
+        shotData["LOC_X"] *= -1
+        made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+        missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"))
-    fig.add_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="RED", name="Missed Shot"))
-    
-    layout = go.Layout(
-        title='Shots by %s in the %s NBA season' % (playerName, season), 
-        showlegend=False,
-        xaxis=dict(
-            showgrid=False,
-            range=[-300, 300],
-            showticklabels=False,
-            zeroline=False
-        ),
-        yaxis=dict(
-            showgrid=False,
-            range=[-100, 500],
-            showticklabels=False,
-            zeroline=False
-        ),
-        height=800,
-        width=1000,
-        shapes=court_shapes,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        hovermode=False
-    )
-    fig.update(layout=layout)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"))
+        fig.add_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="RED", name="Missed Shot"))
+        
+        layout = go.Layout(
+            title='Shots by %s in the %s NBA season' % (playerName, season), 
+            showlegend=False,
+            xaxis=dict(
+                showgrid=False,
+                range=[-300, 300],
+                showticklabels=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=False,
+                range=[-100, 500],
+                showticklabels=False,
+                zeroline=False
+            ),
+            height=800,
+            width=1000,
+            shapes=court_shapes,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            hovermode=False
+        )
+        fig.update(layout=layout)
 
-    return fig
+        return fig
+    except(IndexError, ValueError):
+        fig = go.Figure()
+        layout = go.Layout(
+            title='Error: Invalid input for either player name, season or both', 
+            showlegend=False,
+            xaxis=dict(
+                showgrid=False,
+                range=[-300, 300],
+                showticklabels=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=False,
+                range=[-100, 500],
+                showticklabels=False,
+                zeroline=False
+            ),
+            height=800,
+            width=1000,
+            shapes=court_shapes,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            hovermode=False
+        )
+        fig.update(layout=layout)
+
+        return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
