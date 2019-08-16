@@ -3,21 +3,9 @@ from nba_api.stats.static import players
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
 
 def getShotData(name, year):
-    string_season = f"{str(year)}-{str(year+1)[-2:]}"
-    playerID = players.find_players_by_full_name(name)[0]['id']
-    shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= string_season, context_measure_simple= "FGA")
-    shotData = shotchart_detail.get_data_frames()[0]
-    shotData["LOC_X"] *= -1
-
-    made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
-    missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"))
-    fig.add_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="RED", name="Missed Shot"))
 
     court_shapes = []
- 
+
     outer_lines_shape = dict(
         type='rect',
         xref='x',
@@ -31,7 +19,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(outer_lines_shape)
 
     hoop_shape = dict(
@@ -47,7 +35,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(hoop_shape)
 
     backboard_shape = dict(
@@ -64,7 +52,7 @@ def getShotData(name, year):
         ),
     fillcolor='rgba(10, 10, 10, 1)'
     )
- 
+
     court_shapes.append(backboard_shape)
 
     outer_three_sec_shape = dict(
@@ -80,7 +68,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(outer_three_sec_shape)
 
     inner_three_sec_shape = dict(
@@ -96,7 +84,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(inner_three_sec_shape)
 
     left_line_shape = dict(
@@ -112,7 +100,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(left_line_shape)
 
     right_line_shape = dict(
@@ -128,7 +116,7 @@ def getShotData(name, year):
             width=1
         )
     )   
- 
+
     court_shapes.append(right_line_shape)
 
     three_point_arc_shape = dict(
@@ -141,7 +129,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(three_point_arc_shape)
 
     center_circle_shape = dict(
@@ -157,7 +145,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(center_circle_shape)
 
     res_circle_shape = dict(
@@ -173,7 +161,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(res_circle_shape)
 
     free_throw_circle_shape = dict(
@@ -189,7 +177,7 @@ def getShotData(name, year):
             width=1
         )
     )
- 
+
     court_shapes.append(free_throw_circle_shape)
 
     res_area_shape = dict(
@@ -206,32 +194,72 @@ def getShotData(name, year):
             dash='dot'
         )
     )
- 
-    court_shapes.append(res_area_shape)
-    #print(string_season)
-    layout = go.Layout(
-        title='Shots by %s in the %s NBA season' % (str(name), str(string_season)), #change to be based on variable passed
-        showlegend=True,
-        xaxis=dict(
-            showgrid=False,
-            range=[-300, 300],
-            showticklabels=False,
-            zeroline=False
-        ),
-        yaxis=dict(
-            showgrid=False,
-            range=[-100, 500],
-            showticklabels=False,
-            zeroline=False
-        ),
-        height = 800,
-        width = 1000,
-        shapes=court_shapes,
-        hovermode=False
-        
-    )
 
-    fig.update(layout=layout)
-    fig.show()
+    court_shapes.append(res_area_shape)
+
+    string_season = f"{str(year)}-{str(year+1)[-2:]}"
+    #playerID = players.find_players_by_full_name(name)[0]['id']
+    try: 
+        playerID = players.find_players_by_full_name(name)[0]['id']
+        shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= string_season, context_measure_simple= "FGA")
+        shotData = shotchart_detail.get_data_frames()[0]
+        shotData["LOC_X"] *= -1
+
+        made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
+        missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=made_shots["LOC_X"], y=made_shots["LOC_Y"], mode='markers', marker_color="BLUE", name="Made Shot"))
+        fig.add_trace(go.Scatter(x=missed_shots["LOC_X"], y=missed_shots["LOC_Y"], mode='markers', marker_color="RED", name="Missed Shot"))
+
+        layout = go.Layout(
+            title='Shots by %s in the %s NBA season' % (str(name), str(string_season)), #change to be based on variable passed
+            showlegend=True,
+            xaxis=dict(
+                showgrid=False,
+                range=[-300, 300],
+                showticklabels=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=False,
+                range=[-100, 500],
+                showticklabels=False,
+                zeroline=False
+            ),
+            height = 800,
+            width = 1000,
+            shapes=court_shapes,
+            hovermode=False
+        )
+
+        fig.update(layout=layout)
+        fig.show()
+    except (IndexError, ValueError):
+        fig=go.Figure()
+
+        layout = go.Layout(
+            title='Error: Invalid input for either player name, season or both', #change to be based on variable passed
+            showlegend=True,
+            xaxis=dict(
+                showgrid=False,
+                range=[-300, 300],
+                showticklabels=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=False,
+                range=[-100, 500],
+                showticklabels=False,
+                zeroline=False
+            ),
+            height = 800,
+            width = 1000,
+            shapes=court_shapes,
+            hovermode=False
+        )
+        fig.update(layout=layout)
+        fig.show()
+    
 
 getShotData("Lebron James", 2018)
