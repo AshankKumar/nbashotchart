@@ -6,6 +6,7 @@ import plotly.graph_objs as go
 import plotly.io as pio
 from nba_api.stats.static import players
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
+import datetime
 
 pio.templates.default= "none"
 
@@ -255,6 +256,11 @@ def update_figure(n_clicks, playerName, season):
         playerID = players.find_players_by_full_name(str(playerName))[0]['id']
         shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= str(season), context_measure_simple= "FGA")
         shotData = shotchart_detail.get_data_frames()[0]
+
+        seasonFirst = season[2:4]
+        if(int(seasonFirst) < 0 or int(seasonFirst) < 13 or int(seasonFirst) > (datetime.datetime.now().year % 100) or len(shotData) == 0): #check to see if a bad season has been entered even if formatting is fine
+                raise ValueError
+
         shotData["LOC_X"] *= -1
         made_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 1]
         missed_shots = shotData.loc[shotData.SHOT_MADE_FLAG == 0]
@@ -288,10 +294,74 @@ def update_figure(n_clicks, playerName, season):
         fig.update(layout=layout)
 
         return fig
-    except(IndexError, ValueError):
+    except(IndexError): #goes here if playerID fails
+        fig = go.Figure()
+
+        try: #goes here if season formatting is fine
+            playerID = players.find_players_by_full_name(str("Lebron James"))[0]['id']
+            shotchart_detail = ShotChartDetail(team_id = 0, player_id = playerID, season_nullable= str(season), context_measure_simple= "FGA")
+            shotData = shotchart_detail.get_data_frames()[0]
+            
+            seasonFirst = season[2:4]
+            if(int(seasonFirst) < 0 or int(seasonFirst) < 13 or int(seasonFirst) > (datetime.datetime.now().year % 100) or len(shotData) == 0): #check to see if a bad season has been entered even if formatting is fine
+                raise ValueError
+            
+            layout = go.Layout(
+                title='Error: Invalid input for player name', 
+                showlegend=False,
+                xaxis=dict(
+                    showgrid=False,
+                    range=[-300, 300],
+                    showticklabels=False,
+                    zeroline=False
+                ),
+                yaxis=dict(
+                    showgrid=False,
+                    range=[-100, 500],
+                    showticklabels=False,
+                    zeroline=False
+                ),
+                height=800,
+                width=1000,
+                shapes=court_shapes,
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                hovermode=False
+            )
+            fig.update(layout=layout)
+
+            return fig
+        except(ValueError):#goes here is season formatting is incorrect also
+            layout = go.Layout(
+                title='Error: Invalid input for both player name and season year', 
+                showlegend=False,
+                xaxis=dict(
+                    showgrid=False,
+                    range=[-300, 300],
+                    showticklabels=False,
+                    zeroline=False
+                ),
+                yaxis=dict(
+                    showgrid=False,
+                    range=[-100, 500],
+                    showticklabels=False,
+                    zeroline=False
+                ),
+                height=800,
+                width=1000,
+                shapes=court_shapes,
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                hovermode=False
+            )
+            fig.update(layout=layout)
+
+            return fig
+
+    except(ValueError): #goes here is player formatting is fine but season formatting is wrong
         fig = go.Figure()
         layout = go.Layout(
-            title='Error: Invalid input for either player name, season or both', 
+            title='Error: Invalid input for season year', 
             showlegend=False,
             xaxis=dict(
                 showgrid=False,
