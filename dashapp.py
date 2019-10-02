@@ -207,6 +207,11 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+
 app.layout = html.Div([
     html.Div([
         dcc.Graph(
@@ -216,7 +221,6 @@ app.layout = html.Div([
                     title="test",
                     shapes= court_shapes,
                     height=800,
-                    width=1000,
                     xaxis= dict(
                         showgrid=False,
                         range=[-300, 300],
@@ -236,12 +240,12 @@ app.layout = html.Div([
                 'staticPlot': True
             }
         ),
-    ],style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
+    ]),#,style = {'margin': 'auto', 'width': '50%'}), #need 'width': '50%' for some reason. Could use margin-left to "center" this too
     html.Div([
             dcc.Input(id='playerName-state', type='text', value='Brook Lopez'),
             dcc.Input(id='season-state', type='text', value='2018-19'),
             html.Button('Submit', id='button')
-    ],style = {'margin-left': '675px'})
+    ],style = {"width": "100%", "display": "flex", "align-items": "center", "justify-content": "center"})
 ])
 
 @app.callback(
@@ -285,7 +289,6 @@ def update_figure(n_clicks, playerName, season):
                 zeroline=False
             ),
             height=800,
-            width=1000,
             shapes=court_shapes,
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -322,7 +325,6 @@ def update_figure(n_clicks, playerName, season):
                     zeroline=False
                 ),
                 height=800,
-                width=1000,
                 shapes=court_shapes,
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
@@ -348,7 +350,6 @@ def update_figure(n_clicks, playerName, season):
                     zeroline=False
                 ),
                 height=800,
-                width=1000,
                 shapes=court_shapes,
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
@@ -376,7 +377,6 @@ def update_figure(n_clicks, playerName, season):
                 zeroline=False
             ),
             height=800,
-            width=1000,
             shapes=court_shapes,
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
